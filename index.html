@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      .column-container {
+        height: 65%;
+        width: 300px;
+        border: 1px solid black;
+        position: relative;
+      }
+
+      header {
+        overflow: hidden;
+      }
+
+      h1 {
+        animation: riseup 2s forwards;
+        transform: translateY(100px);
+        overflow: hidden;
+      }
+
+      h5 {
+        background: white;
+        position: relative;
+        z-index: 5;
+      }
+
+      .block {
+        width: 30px;
+        position: absolute;
+        bottom: 0;
+        transition: 0.2s ease;
+        border: 1px solid black;
+        background: lightgray;
+      }
+
+      @keyframes riseup {
+        100% {
+          transform: translateY(0);
+        }
+      }
+    </style>
+    <title>Bubble-Sort Visual</title>
+  </head>
+  <body>
+    <header>
+      <h1>~ Bubble Sort ~</h1>
+      <h5>Click to create/sort the columns! 😎</h5>
+    </header>
+    <button class="action-btn" onclick="doAction()">Create Columns</button>
+
+    <div class="column-container"></div>
+
+    <strong>JankyJSProductions</strong>
+
+    <script>
+      let isRunning = false;
+      var columnContainer = document.querySelector(".column-container");
+      function doAction() {
+        if (isRunning) return;
+        let btnText = document.querySelector(".action-btn");
+        console.log(btnText);
+        if (btnText.innerHTML == "Create Columns") {
+          btnText.innerHTML = "SORT!";
+          console.log("changeBtnText!!");
+          createColumns();
+        } else {
+          bubbleSort();
+          isRunning = true;
+          btnText.innerHTML = "Create Columns";
+        }
+      }
+
+      function createColumns() {
+        console.log("createColumns fired");
+        columnContainer.innerHTML = "";
+
+        for (let i = 0; i < 10; i++) {
+          let value = (Math.random() * 125) | (0 + 25);
+          let blockDiv = document.createElement("div");
+          blockDiv.className = "block";
+          blockDiv.setAttribute("data-value", value);
+          blockDiv.style.height = `${value * 2}px`;
+          blockDiv.innerHTML = value;
+          blockDiv.style.transform = `translate(${i * 30}px)`;
+          columnContainer.append(blockDiv);
+        }
+      }
+
+      async function swap(elOne, elTwo) {
+        return new Promise((resolve) => {
+          let temp = elOne.style.transform;
+          elOne.style.transform = elTwo.style.transform;
+          elTwo.style.transform = temp;
+
+          window.requestAnimationFrame(function () {
+            setTimeout(() => {
+              columnContainer.insertBefore(elTwo, elOne);
+              resolve();
+            }, 200);
+          });
+        });
+      }
+
+      async function bubbleSort(time = 100) {
+        console.log("bubbleSort fired!");
+
+        let columns = document.querySelectorAll(".block");
+
+        for (let i = 0; i < columns.length; i++) {
+          for (let j = 0; j < columns.length - i - 1; j++) {
+            columns[j].style.backgroundColor = "skyblue";
+            columns[j + 1].style.backgroundColor = "skyblue";
+
+            await new Promise((resolve) => {
+              setTimeout(() => {
+                resolve();
+              }, time);
+            });
+            if (
+              parseInt(columns[j].getAttribute("data-value")) >
+              parseInt(columns[j + 1].getAttribute("data-value"))
+            ) {
+              console.log("Swapping");
+              await swap(columns[j], columns[j + 1]);
+              columns = document.querySelectorAll(".block");
+            }
+            columns[j].style.backgroundColor = "lightgray";
+            columns[j + 1].style.backgroundColor = "lightgray";
+
+            columns[columns.length - i - 1].style.backgroundColor = "green";
+            if (i == columns.length - 2) isRunning = false;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
